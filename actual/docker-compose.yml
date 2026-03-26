@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # ===================
+  # MariaDB (Database)
+  # ===================
+  mariadb:
+    container_name: marinadb
+    build: ./requirements/mariadb
+    restart: always
+    env_file: .env
+    networks:
+      - inception_net
+    volumes:
+      - mariadb_data:/var/lib/mtsql
+  # ======================
+  #   WordPress + PHP-FPM
+  # ======================
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    restart: always
+    env_file: .env
+    depends_on:
+      - mariadb
+    networks:
+      - inception_net
+    volumes:
+      - wordpress_data: /var/www/html
+  # ======================
+  #   NGINX (Web Server)
+  # ======================
+  nginx:
+    container_name: nginx
+    build: ./requirements/NGINX
+    env_file: .env
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    networks:
+      - inception_net
+    volumes:
+      - wordpress_data:/var/www/html
+  # ======================
+  #   Networks
+  # ======================
+  Networks:
+    inception_net:
+      driver: bridge
+      name: inception_net
+  # ======================
+  #   Volumes
+  # ======================
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/shattori/data/mariadb
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/shattori/data/wordpress
+      o: bind
