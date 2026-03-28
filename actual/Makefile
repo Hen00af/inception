@@ -12,9 +12,17 @@ RESET		=	\033[0m
 # ======================
 
 LOGIN			=	shattori
-DATA_PATH		=	/home/$(LOGIN)/data
-COMPOSE_DIR		=	./srcs
+
+UNAME			:=	$(shell uname)
+ifeq ($(UNAME), Darwin)
+	DATA_PATH	=	$(HOME)/data
+else
+	DATA_PATH	=	/home/$(LOGIN)/data
+endif
+COMPOSE_DIR		=	./
 COMPOSE_FILE	=	$(COMPOSE_DIR)/docker-compose.yml
+
+export DATA_PATH
 
 # ======================
 #	rules
@@ -25,8 +33,7 @@ all: up
 up: 
 	@mkdir	-p	$(DATA_PATH)/mariadb
 	@mkdir	-p	$(DATA_PATH)/wordpress
-	@docker compose -f $(COMPOSE_FILE) up -d --build
-
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) up -d --build
 	@printf	"$(GREEN)Container is successfully up!$(RESET) \n"
 
 # Stop Container

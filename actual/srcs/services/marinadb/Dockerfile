@@ -11,7 +11,7 @@ RUN mkdir -p /var/run/mysqld && \
     chmod 777 /var/run/mysqld
 
 # 設定ファイルと起動スクリプトをコンテナ内にコピー
-COPY ./conf/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
+COPY ./conf/mariadb_server.conf /etc/my.cnf.d/mariadb-server.cnf
 COPY ./tools/entrypoint.sh /usr/local/bin/
 
 # スクリプトに実行権限を付与

@@ -5,63 +5,68 @@ services:
   # MariaDB (Database)
   # ===================
   mariadb:
-    container_name: marinadb
-    build: ./requirements/mariadb
+    container_name: mariadb
+    build: ./srcs/services/marinadb
     restart: always
     env_file: .env
     networks:
       - inception_net
     volumes:
-      - mariadb_data:/var/lib/mtsql
+      - mariadb_data:/var/lib/mysql
+
   # ======================
-  #   WordPress + PHP-FPM
+  #   WordPress + PHP-FPM (TODO: Dockerfile未作成)
   # ======================
-  wordpress:
-    container_name: wordpress
-    build: ./requirements/wordpress
-    restart: always
-    env_file: .env
-    depends_on:
-      - mariadb
-    networks:
-      - inception_net
-    volumes:
-      - wordpress_data: /var/www/html
+  # wordpress:
+  #   container_name: wordpress
+  #   build: ./srcs/services/wordpress
+  #   restart: always
+  #   env_file: .env
+  #   depends_on:
+  #     - mariadb
+  #   networks:
+  #     - inception_net
+  #   volumes:
+  #     - wordpress_data:/var/www/html
+
   # ======================
-  #   NGINX (Web Server)
+  #   NGINX (TODO: Dockerfile未作成)
   # ======================
-  nginx:
-    container_name: nginx
-    build: ./requirements/NGINX
-    env_file: .env
-    depends_on:
-      - wordpress
-    ports:
-      - "443:443"
-    networks:
-      - inception_net
-    volumes:
-      - wordpress_data:/var/www/html
-  # ======================
-  #   Networks
-  # ======================
-  Networks:
-    inception_net:
-      driver: bridge
-      name: inception_net
-  # ======================
-  #   Volumes
-  # ======================
+  # nginx:
+  #   container_name: nginx
+  #   build: ./srcs/services/nginx
+  #   restart: always
+  #   env_file: .env
+  #   depends_on:
+  #     - wordpress
+  #   ports:
+  #     - "443:443"
+  #   networks:
+  #     - inception_net
+  #   volumes:
+  #     - wordpress_data:/var/www/html
+
+# ======================
+#   Networks
+# ======================
+networks:
+  inception_net:
+    driver: bridge
+    name: inception_net
+
+# ======================
+#   Volumes
+# ======================
 volumes:
   mariadb_data:
     driver: local
     driver_opts:
       type: none
-      device: /home/shattori/data/mariadb
+      device: ${DATA_PATH}/mariadb
       o: bind
-  wordpress_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: /home/shattori/data/wordpress
-      o: bind
+  # wordpress_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: ${DATA_PATH}/wordpress
+  #     o: bind
