@@ -3,7 +3,7 @@ FROM alpine:3.18
 
 # パッケージの更新とMariaDBのインストール
 RUN apk update && \
-    apk add --no-cache mariadb mariadb-client
+    apk add --no-cache mariadb mariadb-client curl unzip
 
 # MySQLの実行に必要なディレクトリを作成し、権限を付与
 RUN mkdir -p /var/run/mysqld && \
@@ -22,3 +22,4 @@ EXPOSE 3306
 
 # コンテナ起動時に実行されるコマンド
 ENTRYPOINT ["entrypoint.sh"]
+

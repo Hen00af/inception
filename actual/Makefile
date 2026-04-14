@@ -11,21 +11,14 @@ RESET		=	\033[0m
 #	variables
 # ======================
 
-LOGIN			=	shattori
-
-UNAME			:=	$(shell uname)
-ifeq ($(UNAME), Darwin)
-	DATA_PATH	=	$(HOME)/data
-else
-	DATA_PATH	=	/home/$(LOGIN)/data
-endif
+DATA_PATH		=	$(HOME)/data
 COMPOSE_DIR		=	./
 COMPOSE_FILE	=	$(COMPOSE_DIR)/docker-compose.yml
 
 export DATA_PATH
 
 # ======================
-#	rules
+#	global　rules
 # ======================
 
 all: up
@@ -38,20 +31,39 @@ up:
 
 # Stop Container
 down:
-	@docker compose -f $(COMPOSE_FILE) down
-	@printf "$(YELLOW)🛑 Container is Downed$(RESET)\n"
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) down
+	@printf "$(YELLOW)Container is stopped.$(RESET)\n"
 
-# delete container, network, image, volume.
+# delete containers and network.
 clean:
-	@docker compose -f $(COMPOSE_FILE) down -v --rmi all --remove-orphans
-	@printf "$(CYAN)🧹 container, network, image, volume is cleaned.$(RESET)\n"
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) down --remove-orphans
+	@printf "$(CYAN)Containers and network are cleaned.$(RESET)\n"
 
 fclean:	clean
-	@sudo rm -rf $(DATA_PATH)/mariadb
-	@sudo rm -rf $(DATA_PATH)/wordpress
-	@docker system prune -af --volumes
-	@printf "$(RED)💥 All data and docker cache are completely removed!$(RESET)\n"
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) down -v --rmi all --remove-orphans
+	@rm -rf $(DATA_PATH)/mariadb
+	@rm -rf $(DATA_PATH)/wordpress
+	@printf "$(RED)Project containers, images, volumes, and data are removed.$(RESET)\n"
 
 re: fclean all
 
-.PHONY:	all up	down clean fclean re
+# ======================
+#	local rules
+# ======================
+
+mariadb-up:
+	@mkdir -p $(DATA_PATH)/mariadb
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) up -d --build mariadb
+	@printf "$(GREEN)MariaDB container is up.$(RESET)\n"
+
+nginx-up:
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) up -d --build nginx
+	@printf "$(GREEN)Nginx container is up.$(RESET)\n"
+
+wordpress-up:
+	@mkdir -p $(DATA_PATH)/wordpress
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) up -d --build wordpress
+	@printf "$(GREEN)WordPress container is up.$(RESET)\n"
+
+
+.PHONY:	all up down clean fclean re mariadb-up nginx-up wordpress-up

@@ -15,36 +15,48 @@ services:
       - mariadb_data:/var/lib/mysql
 
   # ======================
-  #   WordPress + PHP-FPM (TODO: Dockerfile未作成)
+  #   Redis Cache
   # ======================
-  # wordpress:
-  #   container_name: wordpress
-  #   build: ./srcs/services/wordpress
-  #   restart: always
-  #   env_file: .env
-  #   depends_on:
-  #     - mariadb
-  #   networks:
-  #     - inception_net
-  #   volumes:
-  #     - wordpress_data:/var/www/html
+  redis:
+    container_name: redis
+    build: ./srcs/services/redis
+    restart: always
+    
+    networks:
+      - inception_net
 
   # ======================
-  #   NGINX (TODO: Dockerfile未作成)
+  #   WordPress + PHP-FPM
   # ======================
-  # nginx:
-  #   container_name: nginx
-  #   build: ./srcs/services/nginx
-  #   restart: always
-  #   env_file: .env
-  #   depends_on:
-  #     - wordpress
-  #   ports:
-  #     - "443:443"
-  #   networks:
-  #     - inception_net
-  #   volumes:
-  #     - wordpress_data:/var/www/html
+  wordpress:
+    container_name: wordpress
+    build: ./srcs/services/wordpress
+    restart: always
+    env_file: .env
+    depends_on:
+      - mariadb
+      - redis
+    networks:
+      - inception_net
+    volumes:
+      - wordpress_data:/var/www/html
+
+  # ======================
+  #   NGINX
+  # ======================
+  nginx:
+    container_name: nginx
+    build: ./srcs/services/nginx
+    restart: always
+    env_file: .env
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    networks:
+      - inception_net
+    volumes:
+      - wordpress_data:/var/www/html
 
 # ======================
 #   Networks
@@ -64,9 +76,9 @@ volumes:
       type: none
       device: ${DATA_PATH}/mariadb
       o: bind
-  # wordpress_data:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: ${DATA_PATH}/wordpress
-  #     o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_PATH}/wordpress
+      o: bind
