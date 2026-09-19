@@ -2,6 +2,15 @@
 
 ## 実行方法
 
+```sh
+cp .env.example .env
+# .env 内の change_this_* を安全な値に置き換える
+make
+```
+
+`.env` は認証情報を含むため Git 管理されません。共有・再作成用には
+`.env.example` を使います。
+
 ## docker compose.ymlのポイント
 docker-compose.yml のポイントと罠回避restart:
 always (要件クリア):
