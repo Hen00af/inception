@@ -20,9 +20,9 @@ RUN apk update && \
         php82-pecl-redis \
         mariadb-client \
         wget
-
+# php と php82のシンボリックの作成
 RUN ln -sf /usr/bin/php82 /usr/bin/php
-
+# WP-CLIのインストール
 RUN wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
