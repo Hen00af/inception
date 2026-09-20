@@ -22,8 +22,6 @@ services:
     container_name: adminer
     build: ./services/adminer
     restart: always
-    ports:
-      - "8081:8080"
     networks:
       - inception_net
     depends_on:
@@ -91,8 +89,6 @@ services:
     container_name: static-site
     build: ./services/static-site
     restart: always
-    ports:
-      - "8080:8080"
     networks:
       - inception_net
     volumes:

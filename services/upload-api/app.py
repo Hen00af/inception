@@ -27,6 +27,17 @@ class App(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/health":
             return self.json(200, {"status": "ok"})
+        if path == "/files":
+            if not self.auth():
+                self.send_response(401); self.send_header("WWW-Authenticate", "Basic realm=upload"); self.end_headers(); return
+            try:
+                with ftplib.FTP(FTP_HOST, timeout=15) as ftp:
+                    ftp.login(FTP_USER, FTP_PASSWORD)
+                    files = sorted(os.path.basename(item) for item in ftp.nlst("uploads"))
+                return self.json(200, {"files": files})
+            except Exception as error:
+                print(f"FTP list failed: {error}", flush=True)
+                return self.json(404, {"error": "uploads not found"})
         if not path.startswith("/files/"):
             return self.json(404, {"error": "not found"})
         if not self.auth():
