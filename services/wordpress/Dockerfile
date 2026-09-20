@@ -7,6 +7,7 @@ RUN apk update && \
         php82-mysqli \
         php82-json \
         php82-curl \
+        php82-ctype \
         php82-dom \
         php82-exif \
         php82-fileinfo \

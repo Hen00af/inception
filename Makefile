@@ -42,7 +42,8 @@ clean:
 fclean:	clean
 	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) down -v --rmi all --remove-orphans
 	@rm -rf $(DATA_PATH)/mariadb
-	@rm -rf $(DATA_PATH)/wordpress
+	@rm -rf $(DATA_PATH)/wordpres
+	@rm -rf $(DATA_PATH)/ftp 
 	@printf "$(RED)Project containers, images, volumes, and data are removed.$(RESET)\n"
 
 re: fclean all

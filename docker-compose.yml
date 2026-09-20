@@ -11,9 +11,23 @@ services:
       - inception_net
     volumes:
       - wordpress_data:/var/www/html
+      - static_site_data:/var/www/html/static-site
     ports:
       - "21:21"
       - "21000-21010:21000-21010"
+  # ===================
+  # adminer 
+  # ===================
+  adminer:
+    container_name: adminer
+    build: ./services/adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    networks:
+      - inception_net
+    depends_on:
+      - mariadb
   # ===================
   # MariaDB (Database)
   # ===================
@@ -70,7 +84,28 @@ services:
       - inception_net
     volumes:
       - wordpress_data:/var/www/html
-
+# ======================
+#   static-site
+# ======================
+  static-site:
+    container_name: static-site
+    build: ./services/static-site
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - inception_net
+    volumes:
+      - static_site_data:/var/www/static
+  upload-api:
+    container_name: upload-api
+    build: ./services/upload-api
+    restart: always
+    env_file: .env
+    depends_on:
+      - ftp
+    networks:
+      - inception_net
 # ======================
 #   Networks
 # ======================
@@ -83,6 +118,8 @@ networks:
 #   Volumes
 # ======================
 volumes:
+  static_site_data:
+    driver: local
   mariadb_data:
     driver: local
     driver_opts:
