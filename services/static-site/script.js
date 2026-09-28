@@ -1,10 +1,19 @@
 const input = document.querySelector("#file");
 const status = document.querySelector("#status");
 const list = document.querySelector("#files");
-const credentials = () => {
-  const user = prompt("FTP username"); const password = prompt("FTP password");
-  return user && password ? "Basic " + btoa(user + ":" + password) : null;
-};
+const dialog = document.querySelector("#credentials");
+const credentials = () => new Promise(resolve => {
+  const form = dialog.querySelector("form");
+  form.reset();
+  dialog.returnValue = "";
+  dialog.addEventListener("close", () => {
+    const user = form.elements.username.value;
+    const password = form.elements.password.value;
+    form.reset();
+    resolve(dialog.returnValue === "confirm" && user && password ? "Basic " + btoa(user + ":" + password) : null);
+  }, { once: true });
+  dialog.showModal();
+});
 async function loadFiles(auth) {
   const response = await fetch("files", { headers: { Authorization: auth } });
   const result = await response.json().catch(() => ({}));
@@ -14,7 +23,7 @@ async function loadFiles(auth) {
 }
 document.querySelector("#upload").onclick = async () => {
   if (!input.files[0]) return (status.textContent = "ファイルを選んでください");
-  const auth = credentials(); if (!auth) return;
+  const auth = await credentials(); if (!auth) return;
   const data = new FormData(); data.append("file", input.files[0]);
   status.textContent = "Uploading...";
   const response = await fetch("upload", { method: "POST", headers: { Authorization: auth }, body: data });
@@ -23,12 +32,12 @@ document.querySelector("#upload").onclick = async () => {
   await loadFiles(auth); status.textContent = `Uploaded: ${result.path}`;
 };
 document.querySelector("#refresh").onclick = async () => {
-  const auth = credentials(); if (!auth) return;
+  const auth = await credentials(); if (!auth) return;
   try { await loadFiles(auth); } catch (error) { status.textContent = `Load failed: ${error.message}`; }
 };
 document.querySelector("#download").onclick = async () => {
   const name = list.value; if (!name) return (status.textContent = "ファイルを選んでください");
-  const auth = credentials(); if (!auth) return;
+  const auth = await credentials(); if (!auth) return;
   const response = await fetch(`files/${encodeURIComponent(name)}`, { headers: { Authorization: auth } });
   if (!response.ok) return (status.textContent = "Download failed");
   const url = URL.createObjectURL(await response.blob()); const link = Object.assign(document.createElement("a"), { href: url, download: name });

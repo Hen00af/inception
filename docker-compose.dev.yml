@@ -1,0 +1,15 @@
+services:
+  static-site:
+    entrypoint: ["nginx"]
+    command: ["-g", "daemon off;"]
+    volumes:
+      - ./services/static-site:/srv/static:ro
+      - ./dev/static-site.conf:/etc/nginx/http.d/default.conf:ro
+      - ./dev/reload.js:/srv/dev/reload.js:ro
+  wordpress:
+    develop:
+      watch:
+        - action: sync
+          path: ./services/wordpress/mu-plugins
+          target: /var/www/html/wp-content/mu-plugins
+          initial_sync: true

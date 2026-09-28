@@ -30,6 +30,10 @@ up:
 	@printf	"$(GREEN)Container is successfully up!$(RESET) \n"
 
 # Stop Container
+dev:
+	@mkdir -p $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress
+	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) -f docker-compose.dev.yml up --build --watch
+
 down:
 	@cd $(COMPOSE_DIR) && docker compose -f $(COMPOSE_FILE) down
 	@printf "$(YELLOW)Container is stopped.$(RESET)\n"
@@ -67,4 +71,4 @@ wordpress-up:
 	@printf "$(GREEN)WordPress container is up.$(RESET)\n"
 
 
-.PHONY:	all up down clean fclean re mariadb-up nginx-up wordpress-up
+.PHONY:	all up dev down clean fclean re mariadb-up nginx-up wordpress-up

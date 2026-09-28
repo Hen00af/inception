@@ -75,6 +75,26 @@ pass it explicitly, for example `make DATA_PATH=/srv/inception-data up`.
 
 ## Docker Compose management
 
+### Live reload during development
+
+From the repository root, run `make dev` (Docker Compose 2.32.0 or newer).
+This uses `docker-compose.dev.yml` and stays in the foreground; Ctrl-C stops it.
+Open `https://shattori.42.fr/static/` using your configured domain.
+
+- Saving `services/static-site/index.html`, `script.js`, or `style.css` updates
+  the served files immediately and reloads the page within about one second.
+  This is a full page reload, so selected files and form inputs are reset.
+- PHP files in `services/wordpress/mu-plugins/` are synchronized into WordPress
+  through [Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/).
+  Refresh the WordPress page manually to see those changes.
+- Restart `make dev` after changing Dockerfiles or NGINX configuration.
+
+The static files are mounted read-only from the source directory in development.
+FTP uploads remain in their existing volume and are accessed through the file API.
+Run `make up` to return to the normal configuration without browser polling.
+The normal static-site volume retains its own files; development mounts do not
+publish source edits to that volume.
+
 All Compose commands below are run from `actual/`:
 
 ```sh

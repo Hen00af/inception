@@ -47,6 +47,9 @@ if ! $WP plugin is-installed redis-cache; then
     $WP plugin install redis-cache --activate
 fi
 
+mkdir -p "${WP_DIR}/wp-content/mu-plugins"
+cp /usr/local/share/inception-mu-plugins/static-site-link.php "${WP_DIR}/wp-content/mu-plugins/"
+
 chown -R nobody:nobody "${WP_DIR}"
 
 echo "Starting PHP-FPM..."

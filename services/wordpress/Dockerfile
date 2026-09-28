@@ -30,6 +30,7 @@ RUN wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 
 COPY ./conf/www.conf /etc/php82/php-fpm.d/www.conf
 COPY ./tools/setup.sh /usr/local/bin/setup.sh
+COPY ./mu-plugins/ /usr/local/share/inception-mu-plugins/
 RUN chmod +x /usr/local/bin/setup.sh
 
 EXPOSE 9000
